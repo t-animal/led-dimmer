@@ -20,6 +20,7 @@ void httpServerHandleTimeUpdate();
 
 unsigned int currentPercentage = 0;
 
+const char *indexPage = "<!DOCTYPE html> <html> <head>  <meta charset=\"utf-8\">  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <title>LedDimmer config page</title>  <script>   function setCurrent(value) {    const headers = {'Content-Type': 'text/plain'};    fetch(     '/current', {     headers,     method: 'POST',     body: value    });   }    async function getAndWriteTime() {    const time = await (await fetch('/time')).text();    document.querySelector('#currentTime').textContent = time;   }    function forceTimeUpdate() {    const time = fetch('/time/update');    getAndWriteTime();   }    getAndWriteTime();   setInterval(getAndWriteTime, 10000);  </script> </head> <body> <h1>LedDimmer</h1>  <fieldset>  <legend>Presets</legend>  <button onclick=\"setCurrent(100)\">An (100%)</button>  <button onclick=\"setCurrent(70)\">An (70%)</button>  <button onclick=\"setCurrent(70)\">An (30%)</button>  <button onclick=\"setCurrent(0)\">Aus (0%)</button> </fieldset>  <fieldset>  <legend>Datum und Uhrzeit</legend>  <span id=\"currentTime\">Lade...</span> (UTC)  <button onclick=\"forceTimeUpdate()\">Force Update</button> </fieldset> </body> </html>";
 const char* contentType = "Content-Type";
 
 void setUpAndConnectWifi() {
@@ -128,7 +129,7 @@ void httpServerHandleDimValue() {
 }
 
 void httpServerHandleRoot() {
-  sendSuccess("Hallo Welt");
+  server.send(200, "text/html", indexPage);
 }
 
 void httpServerHandleTime() {
