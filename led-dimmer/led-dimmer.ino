@@ -67,11 +67,13 @@ void loop() {
   analogWrite(PWM_PIN, (100 - currentPercentage) * 1023 / 100); 
 }
 
-void sendUserError(String text) {
-  server.send(400, "text/plain", text);
+void sendUserError(String text, int code=400) {
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(code, "text/plain", text);
 }
 
 void sendSuccess(String text) {
+  server.sendHeader("Access-Control-Allow-Origin", "*");
   server.send(200, "text/plain", text);
 }
 
@@ -118,11 +120,11 @@ void httpServerHandleDimValue() {
     return;
   }
 
-  server.send(405, "text/plain", "Method Not Allowed");
+  sendUserError("Method Not Allowed", 405);
 }
 
 void httpServerHandleRoot() {
-  server.send(200, "text/plain", "Hallo Welt");
+  sendSuccess("Hallo Welt");
 }
 
 void httpServerHandleNotFound() {
