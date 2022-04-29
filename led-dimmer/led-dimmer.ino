@@ -4,6 +4,7 @@
 #include <WiFiUdp.h>
 #include <NTPClient.h>
 #include <ESP8266WebServer.h>
+#include <EEPROM.h>
 
 #define PWM_PIN D4
 
@@ -38,6 +39,16 @@ public:
     return true;
   }
 
+  static bool fromEeprom(int index, AutoConfig& config) {
+    EEPROM.get(index * sizeof(AutoConfig), config);
+    return true;
+  }
+
+  void storeInEeprom(int index) {
+    EEPROM.put(index * sizeof(AutoConfig), *this);
+    EEPROM.commit();
+  }
+
   void setPercentageIfApplicable() {
     if(!isEnabled) {
       return;
@@ -65,6 +76,7 @@ private:
     return (hours<10?"0":"") + String(hours) + ":" + (minutes<10?"0":"") + String(minutes);
   }
 };
+
 
 
 void httpServerHandleRoot();
@@ -127,6 +139,8 @@ void setup() {
   timeClient.setUpdateInterval(60*60*1000);
   timeClient.forceUpdate();
 
+  EEPROM.begin(5 * sizeof(AutoConfig));
+  AutoConfig::fromEeprom(0, config0);
 }
 
 void loop() {
@@ -214,6 +228,7 @@ void httpServerHandleConfig() {
     if(!AutoConfig::fromRequest(server, config0)) {
       sendUserError("Malformatted request");
     }
+    config0.storeInEeprom(0);
     sendSuccess(config0.toJson(), 200, "application/json");
   }
 }
