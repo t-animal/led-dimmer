@@ -1,9 +1,14 @@
 #include "string"
 
 #include <WiFiManager.h>
+#include <WiFiUdp.h>
+#include <NTPClient.h>
 #include <ESP8266WebServer.h>
 
 #define PWM_PIN D4
+
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP);
 
 ESP8266WebServer server(80);
 
@@ -35,6 +40,10 @@ void setUpAndConnectWifi() {
   else {
     Serial.println("Successfully connected to Wifi)");
   }
+
+  timeClient.begin();
+  timeClient.setUpdateInterval(60*60*1000);
+  timeClient.forceUpdate();
 }
 
 void setup() {
@@ -54,6 +63,7 @@ void setup() {
 
 void loop() {
   server.handleClient();
+  timeClient.update();
   analogWrite(PWM_PIN, (100 - currentPercentage) * 1023 / 100); 
 }
 
@@ -117,7 +127,8 @@ void httpServerHandleRoot() {
 
 void httpServerHandleNotFound() {
   String message = "File Not Found\n\n";
-  message += "URI: ";
+  message += "Time: " + timeClient.getFormattedTime();
+  message += "\nURI: ";
   message += server.uri();
   message += "\nMethod: ";
   message += (server.method() == HTTP_GET) ? "GET" : "POST";
