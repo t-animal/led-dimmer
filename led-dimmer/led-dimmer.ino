@@ -7,21 +7,78 @@
 
 #define PWM_PIN D4
 
+
+
+unsigned int currentPercentage = 0;
+
+
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
 
 ESP8266WebServer server(80);
+
+class AutoConfig {
+public:
+  bool isEnabled=false;
+  uint8_t startHours=0;
+  uint8_t startMinutes=0;
+
+  uint8_t endHours=0;
+  uint8_t endMinutes=0;
+
+  uint8_t percentage=0;
+
+  static bool fromRequest(ESP8266WebServer& server, AutoConfig& config) {
+    config.isEnabled = server.hasArg("enabled");
+    config.startHours = server.arg("startTime").substring(0, 3).toInt();
+    config.startMinutes = server.arg("startTime").substring(3, 5).toInt();
+    config.endHours = server.arg("endTime").substring(0, 3).toInt();
+    config.endMinutes = server.arg("endTime").substring(3, 5).toInt();
+    config.percentage = server.arg("percentage").toInt();
+    return true;
+  }
+
+  void setPercentageIfApplicable() {
+    if(!isEnabled) {
+      return;
+    }
+
+    if(timeClient.getHours() == startHours && timeClient.getMinutes() == startMinutes) {
+      currentPercentage = percentage;
+    }
+
+    if(timeClient.getHours() == endHours && timeClient.getMinutes() == endMinutes) {
+      currentPercentage = 0;
+    }
+  }
+
+  String toJson() {
+    String json = "{\"enabled\": " + String(isEnabled ?"true": "false") + ",";
+    json += "\"startTime\": \"" + timeString(startHours, startMinutes) + "\",";
+    json += "\"endTime\": \""   + timeString(endHours, endMinutes) + "\",";
+    json += "\"percentage\": " + String(percentage) + "}";
+    return json;
+  }
+
+private: 
+  String timeString(int hours, int minutes) {
+    return (hours<10?"0":"") + String(hours) + ":" + (minutes<10?"0":"") + String(minutes);
+  }
+};
+
 
 void httpServerHandleRoot();
 void httpServerHandleNotFound();
 void httpServerHandleDimValue();
 void httpServerHandleTime();
 void httpServerHandleTimeUpdate();
-
-unsigned int currentPercentage = 0;
+void httpServerHandleConfigUpdate();
 
 const char *indexPage = "<!DOCTYPE html> <html> <head>  <meta charset=\"utf-8\">  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">  <title>LedDimmer config page</title>  <script>   function setCurrent(value) {    const headers = {'Content-Type': 'text/plain'};    fetch(     '/current', {     headers,     method: 'POST',     body: value    });   }    async function getAndWriteTime() {    const time = await (await fetch('/time')).text();    document.querySelector('#currentTime').textContent = time;   }    function forceTimeUpdate() {    const time = fetch('/time/update');    getAndWriteTime();   }    getAndWriteTime();   setInterval(getAndWriteTime, 10000);  </script> </head> <body> <h1>LedDimmer</h1>  <fieldset>  <legend>Presets</legend>  <button onclick=\"setCurrent(100)\">An (100%)</button>  <button onclick=\"setCurrent(70)\">An (70%)</button>  <button onclick=\"setCurrent(70)\">An (30%)</button>  <button onclick=\"setCurrent(0)\">Aus (0%)</button> </fieldset>  <fieldset>  <legend>Datum und Uhrzeit</legend>  <span id=\"currentTime\">Lade...</span> (UTC)  <button onclick=\"forceTimeUpdate()\">Force Update</button> </fieldset> </body> </html>";
 const char* contentType = "Content-Type";
+
+AutoConfig config0;
+
 
 void setUpAndConnectWifi() {
   WiFi.mode(WIFI_STA); // explicitly set mode, esp defaults to STA+AP
@@ -43,10 +100,18 @@ void setUpAndConnectWifi() {
   else {
     Serial.println("Successfully connected to Wifi)");
   }
+}
 
-  timeClient.begin();
-  timeClient.setUpdateInterval(60*60*1000);
-  timeClient.forceUpdate();
+void setupAndStartServer() {
+  server.on("/", httpServerHandleRoot);
+  server.on("/current", httpServerHandleDimValue);
+  server.on("/time", httpServerHandleTime);
+  server.on("/time/update", httpServerHandleTimeUpdate);
+  server.on("/config/0", httpServerHandleConfig);
+  server.onNotFound(httpServerHandleNotFound);
+  
+  server.collectHeaders(&contentType, 1);
+  server.begin();
 }
 
 void setup() {
@@ -56,14 +121,12 @@ void setup() {
 
   pinMode(PWM_PIN, OUTPUT);
 
-  server.on("/", httpServerHandleRoot);
-  server.on("/current", httpServerHandleDimValue);
-  server.on("/time", httpServerHandleTime);
-  server.on("/time/update", httpServerHandleTimeUpdate);
-  server.onNotFound(httpServerHandleNotFound);
+  setupAndStartServer();
   
-  server.collectHeaders(&contentType, 1);
-  server.begin();
+  timeClient.begin();
+  timeClient.setUpdateInterval(60*60*1000);
+  timeClient.forceUpdate();
+
 }
 
 void loop() {
@@ -77,9 +140,9 @@ void sendUserError(String text, int code=400) {
   server.send(code, "text/plain", text);
 }
 
-void sendSuccess(String text) {
+void sendSuccess(String text, int code=200, String contentType="text/plain") {
   server.sendHeader("Access-Control-Allow-Origin", "*");
-  server.send(200, "text/plain", text);
+  server.send(code, contentType, text);
 }
 
 void sendCurrentPercentage() {
@@ -139,6 +202,20 @@ void httpServerHandleTime() {
 void httpServerHandleTimeUpdate() {
   timeClient.forceUpdate();
   sendSuccess(timeClient.getFormattedTime());
+}
+
+void httpServerHandleConfig() {
+  if(server.method() == HTTP_GET) {
+    sendSuccess(config0.toJson(), 200, "application/json");
+    return;
+  }
+
+  if(server.method() == HTTP_POST) {
+    if(!AutoConfig::fromRequest(server, config0)) {
+      sendUserError("Malformatted request");
+    }
+    sendSuccess(config0.toJson(), 200, "application/json");
+  }
 }
 
 void httpServerHandleNotFound() {
