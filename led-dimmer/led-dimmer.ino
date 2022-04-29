@@ -15,6 +15,8 @@ ESP8266WebServer server(80);
 void httpServerHandleRoot();
 void httpServerHandleNotFound();
 void httpServerHandleDimValue();
+void httpServerHandleTime();
+void httpServerHandleTimeUpdate();
 
 unsigned int currentPercentage = 0;
 
@@ -55,6 +57,8 @@ void setup() {
 
   server.on("/", httpServerHandleRoot);
   server.on("/current", httpServerHandleDimValue);
+  server.on("/time", httpServerHandleTime);
+  server.on("/time/update", httpServerHandleTimeUpdate);
   server.onNotFound(httpServerHandleNotFound);
   
   server.collectHeaders(&contentType, 1);
@@ -125,6 +129,15 @@ void httpServerHandleDimValue() {
 
 void httpServerHandleRoot() {
   sendSuccess("Hallo Welt");
+}
+
+void httpServerHandleTime() {
+  sendSuccess(timeClient.getFormattedTime());
+}
+
+void httpServerHandleTimeUpdate() {
+  timeClient.forceUpdate();
+  sendSuccess(timeClient.getFormattedTime());
 }
 
 void httpServerHandleNotFound() {
