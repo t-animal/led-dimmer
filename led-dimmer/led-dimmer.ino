@@ -146,6 +146,7 @@ void setup() {
 void loop() {
   server.handleClient();
   timeClient.update();
+  config0.setPercentageIfApplicable();
   analogWrite(PWM_PIN, (100 - currentPercentage) * 1023 / 100); 
 }
 
