@@ -65,9 +65,9 @@ void setupAndStartServer() {
 }
 
 void setup() {
-  setUpAndConnectWifi();
- 
   Serial.begin(115200);
+
+  setUpAndConnectWifi();
 
   pinMode(PWM_PIN, OUTPUT);
 
