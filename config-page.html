@@ -49,6 +49,10 @@
 			await getAndWriteConfig(index);
 		}
 
+		function setCurrentManually() {
+			setCurrent(document.querySelector('#manualInput').value);
+		}
+
 		getAndWriteTime();
 		setInterval(getAndWriteTime, 10000);
 		getAndWriteConfig(0);
@@ -59,7 +63,10 @@
 	</script>
 
 	<style>
-		label { margin-right: 5ex; }
+		label {
+			margin-right: 5ex;
+			white-space: nowrap;
+		}
 		.auto-config-set { position: relative; }
 		.auto-config-set .loading {
 			position: absolute;
@@ -77,8 +84,15 @@
 	<legend>Presets</legend>
 	<button onclick="setCurrent(100)">An (100%)</button>
 	<button onclick="setCurrent(70)">An (70%)</button>
-	<button onclick="setCurrent(70)">An (30%)</button>
+	<button onclick="setCurrent(30)">An (30%)</button>
 	<button onclick="setCurrent(0)">Aus (0%)</button>
+</fieldset>
+
+<fieldset>
+	<legend>Manual</legend>
+	<input id="manualInput" type="range" min="0" max="100" value="-1" oninput="this.nextElementSibling.value = this.value">
+	<output>---</output>
+	<button onclick="setCurrentManually()">Setzen</button>
 </fieldset>
 
 <fieldset>
