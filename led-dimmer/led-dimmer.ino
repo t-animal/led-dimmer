@@ -18,6 +18,14 @@ NTPClient timeClient(ntpUDP);
 
 ESP8266WebServer server(80);
 
+const int INCORRECT_DIGIT_COUNT=-1;
+const int MALFORMATTED_STRING=-2;
+const int OUT_OF_RANGE=-3;
+int parsePositiveNumber(String string, unsigned int minDigits=1, unsigned int maxDigits=3, int min=0, int max=999);
+int parseHours(String string); 
+int parseMinutes(String string);
+int parsePercentage(String string);
+
 class AutoConfig {
 public:
   bool isEnabled=false;
@@ -30,12 +38,23 @@ public:
   uint8_t percentage=0;
 
   static bool fromRequest(ESP8266WebServer& server, AutoConfig& config) {
-    config.isEnabled = server.hasArg("enabled");
-    config.startHours = server.arg("startTime").substring(0, 3).toInt();
-    config.startMinutes = server.arg("startTime").substring(3, 5).toInt();
-    config.endHours = server.arg("endTime").substring(0, 3).toInt();
-    config.endMinutes = server.arg("endTime").substring(3, 5).toInt();
-    config.percentage = server.arg("percentage").toInt();
+    int isEnabled = server.hasArg("enabled");
+    int startHours = parseHours(server.arg("startTime").substring(0, 2));
+    int startMinutes = parseMinutes(server.arg("startTime").substring(3, 5));
+    int endHours = parseHours(server.arg("endTime").substring(0, 2));
+    int endMinutes = parseMinutes(server.arg("endTime").substring(3, 5));
+    int percentage = parsePercentage(server.arg("percentage"));
+
+    if(startHours < 0 || startMinutes < 0 || endHours < 0 || endMinutes < 0 || percentage < 0) {
+       return false;
+    }
+
+    config.isEnabled = isEnabled;
+    config.startHours = startHours;
+    config.startMinutes = startMinutes;
+    config.endHours = endHours;
+    config.endMinutes = endMinutes;
+    config.percentage = percentage;
     return true;
   }
 
@@ -183,32 +202,28 @@ void httpServerHandleDimValue() {
   }
 
   if(server.method() == HTTP_POST) {
-    String body = server.arg("plain");
-
     if(server.header(contentType) != "text/plain") {
       sendUserError("Send header Content-Type: text/plain");
       return;
     }
+    
+    String body = server.arg("plain");
+    int newValue = parsePercentage(body);
 
-    if(body.length() > 3 || body.length() == 0) {
+    if(newValue == INCORRECT_DIGIT_COUNT) {
       sendUserError("Input too short or too long");
       return;
     }
 
-    for (size_t i = 0; i < body.length(); i++) {
-      if(!isDigit(body[i])) {
-        sendUserError("Malformatted input at char " + i);
-        return;
-      }
-    }
-
-    int newValue = body.toInt();
-    
-    if(newValue < 0 || newValue > 100) {
-      sendUserError("Out of range (must be -1 < x < 101)");
+    if(newValue == MALFORMATTED_STRING) {
+      sendUserError("Malformatted dim value");
       return;
     }
-    
+
+    if(newValue == OUT_OF_RANGE) {
+      sendUserError("Out of range (must be -1 < x < 101)");
+    }
+      
     currentPercentage = newValue;
     
     sendCurrentPercentage();
@@ -264,3 +279,26 @@ void httpServerHandleNotFound() {
   message += "body: " + server.arg("plain");
   server.send(404, "text/plain", message);
 }
+
+int parsePositiveNumber(String string, unsigned int minDigits, unsigned int maxDigits, int min, int max) {
+    if(string.length() > maxDigits || string.length() < minDigits) {
+      return INCORRECT_DIGIT_COUNT;
+    }
+
+    for (size_t i = 0; i < string.length(); i++) {
+      if(!isDigit(string[i])) {
+        return MALFORMATTED_STRING;
+      }
+    }
+
+    int value = string.toInt();
+    
+    if(value < min || value > max) {
+      return OUT_OF_RANGE;
+    }
+
+    return value;
+}
+int parseHours(String string) { return parsePositiveNumber(string, 2, 2, 0, 23); }
+int parseMinutes(String string) { return parsePositiveNumber(string, 2, 2, 0, 59); }
+int parsePercentage(String string) { return parsePositiveNumber(string, 1, 3, 0, 100); }
