@@ -8,6 +8,7 @@
 
 #define PWM_PIN D4
 
+#include "number-parsing.h"
 
 
 unsigned int currentPercentage = 0;
@@ -17,14 +18,6 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP);
 
 ESP8266WebServer server(80);
-
-const int INCORRECT_DIGIT_COUNT=-1;
-const int MALFORMATTED_STRING=-2;
-const int OUT_OF_RANGE=-3;
-int parsePositiveNumber(String string, unsigned int minDigits=1, unsigned int maxDigits=3, int min=0, int max=999);
-int parseHours(String string); 
-int parseMinutes(String string);
-int parsePercentage(String string);
 
 class AutoConfig {
 public:
@@ -279,26 +272,3 @@ void httpServerHandleNotFound() {
   message += "body: " + server.arg("plain");
   server.send(404, "text/plain", message);
 }
-
-int parsePositiveNumber(String string, unsigned int minDigits, unsigned int maxDigits, int min, int max) {
-    if(string.length() > maxDigits || string.length() < minDigits) {
-      return INCORRECT_DIGIT_COUNT;
-    }
-
-    for (size_t i = 0; i < string.length(); i++) {
-      if(!isDigit(string[i])) {
-        return MALFORMATTED_STRING;
-      }
-    }
-
-    int value = string.toInt();
-    
-    if(value < min || value > max) {
-      return OUT_OF_RANGE;
-    }
-
-    return value;
-}
-int parseHours(String string) { return parsePositiveNumber(string, 2, 2, 0, 23); }
-int parseMinutes(String string) { return parsePositiveNumber(string, 2, 2, 0, 59); }
-int parsePercentage(String string) { return parsePositiveNumber(string, 1, 3, 0, 100); }
