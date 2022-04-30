@@ -17,6 +17,31 @@ up to five intervals where the LEDs are turned on and off with a specific dimmed
 - Connect D1 Mini Port GND to LCM-25 Port DIM-
 - Connect Collector/Source of Transistor to DIM-
 
+```
+       ┌─────────────────────┐
+       │        LED-BAR      │
+       └──┬──┬───────────────┘
+          │  │350mA
+         ┌┴──┴──┐
+         │ LCM- │
+         │  25  │
+         │      │
+         └┬───┬─┘
+     DIM+ │   │ DIM-
+          │   ├────────────────────┐
+┌───┐     │   │                    │
+│   ├─────┘   │       ┌────────┐   │
+│BC │Emitter  │       │Arduino ├───┴── GND
+│547├─────────────────┤D1 Mini │
+│B  │Base     │     D4│ESP8266 ├────── 5V
+│   ├─────────┘       │        │
+│   │Collector        │        │
+└───┘                 └────────┘
+```
+
+(Drawing with asciiflow.com)
+
+
 # Quirks
 
 When the Port D4 is connected to the transistor when starting, the arduino doesn't boot properly
