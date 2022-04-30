@@ -4,7 +4,6 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>LedDimmer config page</title>
-	<base href="http://leddimmer.fritz.box">
 	<script>
 		function setCurrent(value) {
 			const headers = {'Content-Type': 'text/plain'};
@@ -17,27 +16,31 @@
 		}
 
 		async function getAndWriteTime() {
-			const time = await (await fetch('time')).text();
+			const time = await (await fetch('/time')).text();
 			document.querySelector('#currentTime').textContent = time;
 		}
 
 		function forceTimeUpdate() {
-			const time = fetch('time/update');
+			const time = fetch('/time/update');
 			getAndWriteTime();
 		}
 
-		async function getAndWriteConfig() {
-			const config = await (await fetch('config/0')).json();
-			document.querySelector('[name=enabled]').checked = config.enabled;
-			document.querySelector('[name=startTime]').value = config.startTime;
-			document.querySelector('[name=endTime]').value = config.endTime;
-			document.querySelector('[name=percentage]').value = config.percentage;
+		async function getAndWriteConfig(index) {
+			const config = await (await fetch('config/' + index)).json();
+			document.querySelector(`[data-config-index="${index}"] [name=enabled]`).checked = config.enabled;
+			document.querySelector(`[data-config-index="${index}"] [name=startTime]`).value = config.startTime;
+			document.querySelector(`[data-config-index="${index}"] [name=endTime]`).value = config.endTime;
+			document.querySelector(`[data-config-index="${index}"] [name=percentage]`).value = config.percentage;
 			console.log(config);
 		}
 
 		getAndWriteTime();
 		setInterval(getAndWriteTime, 10000);
-		getAndWriteConfig();
+		getAndWriteConfig(0);
+		getAndWriteConfig(1);
+		getAndWriteConfig(2);
+		getAndWriteConfig(3);
+		getAndWriteConfig(4);
 	</script>
 </head>
 <body>
@@ -57,9 +60,57 @@
 	<button onclick="forceTimeUpdate()">Force Update</button>
 </fieldset>
 
-<fieldset>
+<h2>Automatisiertes Schalten</h2>
+
+Beachte: Uhrzeiten müssen in UTC angegeben werden (vergleiche Uhrzeit oben).
+
+<fieldset data-config-index="0">
 	<legend>Automatisches ein- und ausschalten Config 1</legend>
-	<form action="http://leddimmer.fritz.box/config/0" method="POST">
+	<form action="/config/0" method="POST">
+		<label>Aktiviert <input type="checkbox" name="enabled"></label>
+		<label>Anschalten um <input type="time" name="startTime" required></label>
+		<label>Abschalten um <input type="time" name="endTime" required></label>
+		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label>
+		<button type="submit">Speichern</button>
+	</form>
+</fieldset>
+
+<fieldset data-config-index="1">
+	<legend>Automatisches ein- und ausschalten Config 2</legend>
+	<form action="/config/1" method="POST">
+		<label>Aktiviert <input type="checkbox" name="enabled"></label>
+		<label>Anschalten um <input type="time" name="startTime" required></label>
+		<label>Abschalten um <input type="time" name="endTime" required></label>
+		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label>
+		<button type="submit">Speichern</button>
+	</form>
+</fieldset>
+
+<fieldset data-config-index="2">
+	<legend>Automatisches ein- und ausschalten Config 3</legend>
+	<form action="/config/2" method="POST">
+		<label>Aktiviert <input type="checkbox" name="enabled"></label>
+		<label>Anschalten um <input type="time" name="startTime" required></label>
+		<label>Abschalten um <input type="time" name="endTime" required></label>
+		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label>
+		<button type="submit">Speichern</button>
+	</form>
+</fieldset>
+
+<fieldset data-config-index="3">
+	<legend>Automatisches ein- und ausschalten Config 4</legend>
+	<form action="/config/2" method="POST">
+		<label>Aktiviert <input type="checkbox" name="enabled"></label>
+		<label>Anschalten um <input type="time" name="startTime" required></label>
+		<label>Abschalten um <input type="time" name="endTime" required></label>
+		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label>
+		<button type="submit">Speichern</button>
+	</form>
+</fieldset>
+
+<fieldset data-config-index="4">
+	<legend>Automatisches ein- und ausschalten Config 5</legend>
+	<form action="/config/2" method="POST">
 		<label>Aktiviert <input type="checkbox" name="enabled"></label>
 		<label>Anschalten um <input type="time" name="startTime" required></label>
 		<label>Abschalten um <input type="time" name="endTime" required></label>

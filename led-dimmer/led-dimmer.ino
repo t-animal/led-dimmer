@@ -90,6 +90,10 @@ const char *indexPage = "<!DOCTYPE html> <html> <head>  <meta charset=\"utf-8\">
 const char* contentType = "Content-Type";
 
 AutoConfig config0;
+AutoConfig config1;
+AutoConfig config2;
+AutoConfig config3;
+AutoConfig config4;
 
 
 void setUpAndConnectWifi() {
@@ -119,7 +123,11 @@ void setupAndStartServer() {
   server.on("/current", httpServerHandleDimValue);
   server.on("/time", httpServerHandleTime);
   server.on("/time/update", httpServerHandleTimeUpdate);
-  server.on("/config/0", httpServerHandleConfig);
+  server.on("/config/0", [](){httpServerHandleConfig(0, config0);});
+  server.on("/config/1", [](){httpServerHandleConfig(1, config1);});
+  server.on("/config/2", [](){httpServerHandleConfig(2, config2);});
+  server.on("/config/3", [](){httpServerHandleConfig(3, config3);});
+  server.on("/config/4", [](){httpServerHandleConfig(4, config4);});
   server.onNotFound(httpServerHandleNotFound);
   
   server.collectHeaders(&contentType, 1);
@@ -141,6 +149,10 @@ void setup() {
 
   EEPROM.begin(5 * sizeof(AutoConfig));
   AutoConfig::fromEeprom(0, config0);
+  AutoConfig::fromEeprom(1, config1);
+  AutoConfig::fromEeprom(2, config2);
+  AutoConfig::fromEeprom(3, config3);
+  AutoConfig::fromEeprom(4, config4);
 }
 
 void loop() {
@@ -219,18 +231,19 @@ void httpServerHandleTimeUpdate() {
   sendSuccess(timeClient.getFormattedTime());
 }
 
-void httpServerHandleConfig() {
+void httpServerHandleConfig(int index, AutoConfig& config) {
   if(server.method() == HTTP_GET) {
-    sendSuccess(config0.toJson(), 200, "application/json");
+    sendSuccess(config.toJson(), 200, "application/json");
     return;
   }
 
   if(server.method() == HTTP_POST) {
-    if(!AutoConfig::fromRequest(server, config0)) {
+    if(!AutoConfig::fromRequest(server, config)) {
       sendUserError("Malformatted request");
+      return;
     }
-    config0.storeInEeprom(0);
-    sendSuccess(config0.toJson(), 200, "application/json");
+    config.storeInEeprom(index);
+    sendSuccess(config.toJson(), 200, "application/json");
   }
 }
 
