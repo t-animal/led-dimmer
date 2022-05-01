@@ -7,7 +7,7 @@ up to five intervals where the LEDs are turned on and off with a specific dimmed
 
 - Controller: D1 Mini ESP8266 https://www.makershop.de/plattformen/d1-mini/3x-d1mini/
 - LED power supply LCM-25 https://www.leds.de/meanwell-lcm-25-350-1050-ma-konstantstromquelle-95267.html
-- Transistor BC 547B (lying around in my parts box, they do the trick)
+- Transistor IRLZ34N (First I used a bipolar BC 547B, because I had more lying around, but the mosfet decreases power consumption by almost 50%)
 - USB power supply
 
 # Setup
@@ -30,12 +30,12 @@ up to five intervals where the LEDs are turned on and off with a specific dimmed
      DIM+ │   │ DIM-
           │   ├────────────────────┐
 ┌───┐     │   │                    │
-│   ├─────┘   │       ┌────────┐   │
-│BC │Emitter  │       │Arduino ├───┴── GND
-│547├─────────────────┤D1 Mini │
-│B  │Base     │     D4│ESP8266 ├────── 5V
-│   ├─────────┘       │        │
-│   │Collector        │        │
+│   ├─────│───┘       ┌────────┐   │
+│IRL│Sourc│e          │Arduino ├───┴── GND
+│Z34├─────┘           │D1 Mini │
+│N  │Drain            │ESP8266 ├────── 5V
+│   ├─────────────────┤        │
+│   |Gate           D4│        │
 └───┘                 └────────┘
 ```
 
