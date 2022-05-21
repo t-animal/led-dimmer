@@ -74,9 +74,33 @@
 		getAndWriteConfig(2);
 		getAndWriteConfig(3);
 		getAndWriteConfig(4);
+
+		if(location.search.includes('mode=dark')) {
+			document.querySelector('html').dataset.mode='dark';
+		}
 	</script>
 
 	<style>
+		html[data-mode='dark'], html[data-mode='dark'] button, html[data-mode='dark'] input {
+			color: #ddd;
+			background-color: #222;
+		}
+		html[data-mode='dark'] button, html[data-mode='dark'] input {
+			background-color: #333;
+			border: 1px solid #ddd;
+			border-radius: 2px;
+		}
+		@media (prefers-color-scheme: dark) {
+			html[data-mode='dark'], html[data-mode='dark'] button, html[data-mode='dark'] input {
+				color: #ddd;
+				background-color: #222;
+			}
+			html[data-mode='dark'] button, html[data-mode='dark'] input {
+				background-color: #333;
+				border: 1px solid #ddd;
+				border-radius: 2px;
+			}
+		}
 		label {
 			margin-right: 5ex;
 			white-space: nowrap;
