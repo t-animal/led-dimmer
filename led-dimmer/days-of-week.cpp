@@ -18,7 +18,7 @@ void DaysOfWeek::parseFromStringList(String abbreviatedList) {
   }
 }
 
-bool DaysOfWeek::isValid() {
+bool DaysOfWeek::isInvalid() {
   return this->bitField == INVALID;
 }
 

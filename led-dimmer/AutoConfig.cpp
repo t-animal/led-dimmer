@@ -10,8 +10,9 @@ bool AutoConfig::fromRequest(ESP8266WebServer& server, AutoConfig& config) {
   DaysOfWeek daysOfWeek;
   daysOfWeek.parseFromStringList(server.arg("daysOfWeek"));
 
+
   if(startHours < 0 || startMinutes < 0 || endHours < 0 || endMinutes < 0 || percentage < 0 
-     || !daysOfWeek.isValid()) {
+     || daysOfWeek.isInvalid()) {
      return false;
   }
 

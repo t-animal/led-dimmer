@@ -15,7 +15,7 @@ public:
     * and no days will be activated.
     */
   void parseFromStringList(String abbreviatedList);
-  bool isValid();
+  bool isInvalid();
 
   void enableDay(DayOfWeek day);
   void disableDay(DayOfWeek day);
