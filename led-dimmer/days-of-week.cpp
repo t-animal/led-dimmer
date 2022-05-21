@@ -11,10 +11,14 @@ void DaysOfWeek::parseFromStringList(String abbreviatedList) {
     }
     enableDay(currentDay);
 
-    if(restOfString.length() < 4 || restOfString[3] != ',') {
-      this->bitField = INVALID;
+    if(restOfString.length() >= 4){
+      if(restOfString[3] != ',') {
+        this->bitField = INVALID;
+      }
+      restOfString = restOfString.substring(4);
+    } else {
+      break;
     }
-    restOfString = restOfString.substring(4);
   }
 }
 
