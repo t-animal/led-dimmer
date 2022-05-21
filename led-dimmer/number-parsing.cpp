@@ -23,3 +23,43 @@ int parsePositiveNumber(String string, unsigned int minDigits, unsigned int maxD
 int parseHours(String string) { return parsePositiveNumber(string, 2, 2, 0, 23); }
 int parseMinutes(String string) { return parsePositiveNumber(string, 2, 2, 0, 59); }
 int parsePercentage(String string) { return parsePositiveNumber(string, 1, 3, 0, 100); }
+
+DayOfWeek parseDayOfWeek(String string) {
+  if(string.equals("Mon")) {
+    return DayOfWeek::Monday;
+  }
+
+  if(string.equals("Tue")) {
+    return DayOfWeek::Tuesday;
+  }
+
+  if(string.equals("Wed")) {
+    return DayOfWeek::Wednesday;
+  }
+
+  if(string.equals("Thu")) {
+    return DayOfWeek::Thursday;
+  }
+
+  if(string.equals("Fri")) {
+    return DayOfWeek::Friday;
+  }
+
+  if(string.equals("Sat")) {
+    return DayOfWeek::Saturday;
+  }
+
+  if(string.equals("Sun")) {
+    return DayOfWeek::Sunday;
+  }
+
+  return DayOfWeek::Unknown;
+}
+
+DayOfWeek sanitizeDayOfWeek(int number) {
+  if(number < 0 || number > 7){
+    return DayOfWeek::Unknown;
+  }
+
+  return (DayOfWeek) number;
+}

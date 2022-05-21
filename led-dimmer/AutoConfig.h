@@ -6,6 +6,7 @@
 #include <NTPClient.h>
 
 #include "number-parsing.h"
+#include "days-of-week.h"
 
 extern EEPROMClass EEPROM;
 extern NTPClient timeClient;
@@ -21,6 +22,8 @@ public:
   uint8_t endMinutes=0;
 
   uint8_t percentage=0;
+
+  DaysOfWeek daysOfWeek;
 
   static bool fromRequest(ESP8266WebServer& server, AutoConfig& config);
 

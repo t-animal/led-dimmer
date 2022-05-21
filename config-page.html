@@ -5,8 +5,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>LedDimmer config page</title>
 	<script>
-		const urlBase='';
-		/*const urlBase='http://leddimmer.fritz.box';*/
+		// const urlBase='';
+		const urlBase='http://leddimmer.fritz.box';
 
 		function setCurrent(value) {
 			const headers = {'Content-Type': 'text/plain'};
@@ -41,6 +41,7 @@
 			document.querySelector(`[data-config-index="${index}"] .loading`).style.display = 'block';
 			const form = document.querySelector(`[data-config-index="${index}"] form`);
 			const data = new URLSearchParams(new FormData(form));
+			data.set('daysOfWeek', data.getAll('daysOfWeek').join(','));
 			await fetch(
 				`${urlBase}/config/${index}`, {
 				method: 'POST',
@@ -67,6 +68,8 @@
 			margin-right: 5ex;
 			white-space: nowrap;
 		}
+		.days-of-week label { margin: 0; }
+		.days-of-week label ~ label { margin-left: 2ex;}
 		.auto-config-set { position: relative; }
 		.auto-config-set .loading {
 			position: absolute;
@@ -109,60 +112,110 @@
 <fieldset class="auto-config-set" data-config-index="0">
 	<div class="loading">Lade...</div>
 	<legend>Automatisches ein- und ausschalten Config 1</legend>
-	<form action="/config/0" method="POST">
+	<form>
 		<label>Aktiviert <input type="checkbox" name="enabled"></label>
 		<label>Anschalten um <input type="time" name="startTime" required></label>
 		<label>Abschalten um <input type="time" name="endTime" required></label>
-		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label>
-		<button onclick="updateConfig(0);return false;" type="submit">Speichern</button>
+		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label> <br />
+		<span class="days-of-week">Aktiv am
+			<label><input type="checkbox" name="daysOfWeek" value="Mon" /> Montag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Tue" /> Dienstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Wed" /> Mittwoch</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Thu" /> Donnerstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Fri" /> Freitag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sat" /> Samstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sun" /> Sonntag</label>
+		</span>
+		<br />
+		<button onclick="updateConfig(0);return false;">Speichern</button>
 	</form>
 </fieldset>
 
 <fieldset class="auto-config-set" data-config-index="1">
 	<div class="loading">Lade...</div>
 	<legend>Automatisches ein- und ausschalten Config 2</legend>
-	<form action="/config/1" method="POST">
+	<form>
 		<label>Aktiviert <input type="checkbox" name="enabled"></label>
 		<label>Anschalten um <input type="time" name="startTime" required></label>
 		<label>Abschalten um <input type="time" name="endTime" required></label>
-		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label>
-		<button onclick="updateConfig(1);return false;" type="submit">Speichern</button>
+		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label> <br />
+		<span class="days-of-week">Aktiv am
+			<label><input type="checkbox" name="daysOfWeek" value="Mon" /> Montag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Tue" /> Dienstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Wed" /> Mittwoch</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Thu" /> Donnerstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Fri" /> Freitag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sat" /> Samstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sun" /> Sonntag</label>
+		</span>
+		<br />
+		<button onclick="updateConfig(1);return false;">Speichern</button>
 	</form>
 </fieldset>
 
 <fieldset class="auto-config-set" data-config-index="2">
 	<div class="loading">Lade...</div>
 	<legend>Automatisches ein- und ausschalten Config 3</legend>
-	<form action="/config/2" method="POST">
+	<form>
 		<label>Aktiviert <input type="checkbox" name="enabled"></label>
 		<label>Anschalten um <input type="time" name="startTime" required></label>
 		<label>Abschalten um <input type="time" name="endTime" required></label>
-		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label>
-		<button onclick="updateConfig(2);return false;" type="submit">Speichern</button>
+		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label> <br />
+		<span class="days-of-week">Aktiv am
+			<label><input type="checkbox" name="daysOfWeek" value="Mon" /> Montag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Tue" /> Dienstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Wed" /> Mittwoch</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Thu" /> Donnerstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Fri" /> Freitag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sat" /> Samstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sun" /> Sonntag</label>
+		</span>
+		<br />
+		<button onclick="updateConfig(2);return false;">Speichern</button>
 	</form>
 </fieldset>
 
 <fieldset class="auto-config-set" data-config-index="3">
 	<div class="loading">Lade...</div>
 	<legend>Automatisches ein- und ausschalten Config 4</legend>
-	<form action="/config/3" method="POST">
+	<form>
 		<label>Aktiviert <input type="checkbox" name="enabled"></label>
 		<label>Anschalten um <input type="time" name="startTime" required></label>
 		<label>Abschalten um <input type="time" name="endTime" required></label>
-		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label>
-		<button onclick="updateConfig(3);return false;" type="submit">Speichern</button>
+		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label> <br />
+		<span class="days-of-week">Aktiv am
+			<label><input type="checkbox" name="daysOfWeek" value="Mon" /> Montag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Tue" /> Dienstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Wed" /> Mittwoch</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Thu" /> Donnerstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Fri" /> Freitag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sat" /> Samstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sun" /> Sonntag</label>
+		</span>
+		<br />
+		<button onclick="updateConfig(3);return false;">Speichern</button>
 	</form>
 </fieldset>
 
 <fieldset class="auto-config-set" data-config-index="4">
 	<div class="loading">Lade...</div>
 	<legend>Automatisches ein- und ausschalten Config 5</legend>
-	<form action="/config/4" method="POST">
+	<form>
 		<label>Aktiviert <input type="checkbox" name="enabled"></label>
 		<label>Anschalten um <input type="time" name="startTime" required></label>
 		<label>Abschalten um <input type="time" name="endTime" required></label>
-		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label>
-		<button onclick="updateConfig(4);return false;" type="submit">Speichern</button>
+		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label> <br />
+		<span class="days-of-week">Aktiv am
+			<label><input type="checkbox" name="daysOfWeek" value="Mon" /> Montag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Tue" /> Dienstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Wed" /> Mittwoch</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Thu" /> Donnerstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Fri" /> Freitag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sat" /> Samstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sun" /> Sonntag</label>
+		</span>
+		<br />
+		<button onclick="updateConfig(4);return false;">Speichern</button>
 	</form>
 </fieldset>
 

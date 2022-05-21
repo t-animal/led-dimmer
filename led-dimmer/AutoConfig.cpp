@@ -7,8 +7,11 @@ bool AutoConfig::fromRequest(ESP8266WebServer& server, AutoConfig& config) {
   int endHours = parseHours(server.arg("endTime").substring(0, 2));
   int endMinutes = parseMinutes(server.arg("endTime").substring(3, 5));
   int percentage = parsePercentage(server.arg("percentage"));
+  DaysOfWeek daysOfWeek;
+  daysOfWeek.parseFromStringList(server.arg("daysOfWeek"));
 
-  if(startHours < 0 || startMinutes < 0 || endHours < 0 || endMinutes < 0 || percentage < 0) {
+  if(startHours < 0 || startMinutes < 0 || endHours < 0 || endMinutes < 0 || percentage < 0 
+     || !daysOfWeek.isValid()) {
      return false;
   }
 
@@ -18,6 +21,7 @@ bool AutoConfig::fromRequest(ESP8266WebServer& server, AutoConfig& config) {
   config.endHours = endHours;
   config.endMinutes = endMinutes;
   config.percentage = percentage;
+  config.daysOfWeek = daysOfWeek;
   return true;
 }
 
@@ -34,6 +38,11 @@ bool AutoConfig:: storeInEeprom(int index) {
 
 void AutoConfig::setPercentageIfApplicable() {
   if(!isEnabled) {
+    return;
+  }
+
+  DayOfWeek today = sanitizeDayOfWeek(timeClient.getDay());
+  if(!daysOfWeek.isEnabled(today)){
     return;
   }
 
