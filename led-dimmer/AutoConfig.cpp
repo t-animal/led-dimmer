@@ -60,6 +60,7 @@ String AutoConfig::toJson() {
   String json = "{\"enabled\": " + String(isEnabled ?"true": "false") + ",";
   json += "\"startTime\": \"" + timeString(startHours, startMinutes) + "\",";
   json += "\"endTime\": \""   + timeString(endHours, endMinutes) + "\",";
-  json += "\"percentage\": " + String(percentage) + "}";
+  json += "\"percentage\": " + String(percentage)  + ",";
+  json += "\"daysOfWeek\": " + daysOfWeek.toString() + "}";
   return json;
 }

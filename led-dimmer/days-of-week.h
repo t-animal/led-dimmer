@@ -20,6 +20,8 @@ public:
   void enableDay(DayOfWeek day);
   void disableDay(DayOfWeek day);
   bool isEnabled(DayOfWeek day);
+
+  String toString();
 private:
     uint8_t bitField = 0;
 };

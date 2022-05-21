@@ -35,6 +35,8 @@
 			document.querySelector(`[data-config-index="${index}"] [name=endTime]`).value = config.endTime;
 			document.querySelector(`[data-config-index="${index}"] [name=percentage]`).value = config.percentage;
 			document.querySelector(`[data-config-index="${index}"] .loading`).style.display = 'none';
+			document.querySelectorAll(`[data-config-index="${index}"] input[name="daysOfWeek"]`).forEach((elem) =>
+				elem.checked = config.daysOfWeek.includes(elem.value));
 			document.querySelectorAll(`[data-config-index="${index}"] [type="time"]`).forEach(printEffective);
 		}
 
