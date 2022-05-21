@@ -35,6 +35,7 @@
 			document.querySelector(`[data-config-index="${index}"] [name=endTime]`).value = config.endTime;
 			document.querySelector(`[data-config-index="${index}"] [name=percentage]`).value = config.percentage;
 			document.querySelector(`[data-config-index="${index}"] .loading`).style.display = 'none';
+			document.querySelectorAll(`[data-config-index="${index}"] [type="time"]`).forEach(printEffective);
 		}
 
 		async function updateConfig(index) {
@@ -52,6 +53,18 @@
 
 		function setCurrentManually() {
 			setCurrent(document.querySelector('#manualInput').value);
+		}
+
+		function printEffective(elem) {
+			const offsetInMinutes = new Date().getTimezoneOffset();
+			const utcHours = elem.valueAsDate.getUTCHours();
+			const utcMinutes = elem.valueAsDate.getUTCMinutes();
+
+			const localHours = parseInt((utcHours * 60 + utcMinutes - offsetInMinutes) / 60 % 24);
+			const localMinutes = (utcHours * 60 + utcMinutes - offsetInMinutes) % 60;
+			const localString = localHours.toString().padStart(2,'0') + ":"
+				 + localMinutes.toString().padStart(2,'0');
+			elem.nextElementSibling.textContent = localString;
 		}
 
 		getAndWriteTime();
@@ -114,8 +127,8 @@
 	<legend>Automatisches ein- und ausschalten Config 1</legend>
 	<form>
 		<label>Aktiviert <input type="checkbox" name="enabled"></label>
-		<label>Anschalten um <input type="time" name="startTime" required></label>
-		<label>Abschalten um <input type="time" name="endTime" required></label>
+		<label>Anschalten um <input type="time" name="startTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
+		<label>Abschalten um <input type="time" name="endTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
 		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label> <br />
 		<span class="days-of-week">Aktiv am
 			<label><input type="checkbox" name="daysOfWeek" value="Mon" /> Montag</label>
@@ -136,8 +149,8 @@
 	<legend>Automatisches ein- und ausschalten Config 2</legend>
 	<form>
 		<label>Aktiviert <input type="checkbox" name="enabled"></label>
-		<label>Anschalten um <input type="time" name="startTime" required></label>
-		<label>Abschalten um <input type="time" name="endTime" required></label>
+		<label>Anschalten um <input type="time" name="startTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
+		<label>Abschalten um <input type="time" name="endTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
 		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label> <br />
 		<span class="days-of-week">Aktiv am
 			<label><input type="checkbox" name="daysOfWeek" value="Mon" /> Montag</label>
@@ -158,8 +171,8 @@
 	<legend>Automatisches ein- und ausschalten Config 3</legend>
 	<form>
 		<label>Aktiviert <input type="checkbox" name="enabled"></label>
-		<label>Anschalten um <input type="time" name="startTime" required></label>
-		<label>Abschalten um <input type="time" name="endTime" required></label>
+		<label>Anschalten um <input type="time" name="startTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
+		<label>Abschalten um <input type="time" name="endTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
 		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label> <br />
 		<span class="days-of-week">Aktiv am
 			<label><input type="checkbox" name="daysOfWeek" value="Mon" /> Montag</label>
@@ -180,8 +193,8 @@
 	<legend>Automatisches ein- und ausschalten Config 4</legend>
 	<form>
 		<label>Aktiviert <input type="checkbox" name="enabled"></label>
-		<label>Anschalten um <input type="time" name="startTime" required></label>
-		<label>Abschalten um <input type="time" name="endTime" required></label>
+		<label>Anschalten um <input type="time" name="startTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
+		<label>Abschalten um <input type="time" name="endTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
 		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label> <br />
 		<span class="days-of-week">Aktiv am
 			<label><input type="checkbox" name="daysOfWeek" value="Mon" /> Montag</label>
@@ -202,8 +215,8 @@
 	<legend>Automatisches ein- und ausschalten Config 5</legend>
 	<form>
 		<label>Aktiviert <input type="checkbox" name="enabled"></label>
-		<label>Anschalten um <input type="time" name="startTime" required></label>
-		<label>Abschalten um <input type="time" name="endTime" required></label>
+		<label>Anschalten um <input type="time" name="startTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
+		<label>Abschalten um <input type="time" name="endTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
 		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label> <br />
 		<span class="days-of-week">Aktiv am
 			<label><input type="checkbox" name="daysOfWeek" value="Mon" /> Montag</label>
