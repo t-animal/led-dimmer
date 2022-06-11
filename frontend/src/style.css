@@ -1,8 +1,34 @@
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+html[data-mode='dark'], html[data-mode='dark'] button, html[data-mode='dark'] input {
+  color: #ddd;
+  background-color: #222;
+}
+html[data-mode='dark'] button, html[data-mode='dark'] input {
+  background-color: #333;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+}
+@media (prefers-color-scheme: dark) {
+  html[data-mode='dark'], html[data-mode='dark'] button, html[data-mode='dark'] input {
+    color: #ddd;
+    background-color: #222;
+  }
+  html[data-mode='dark'] button, html[data-mode='dark'] input {
+    background-color: #333;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+  }
+}
+label {
+  margin-right: 5ex;
+  white-space: nowrap;
+}
+.days-of-week label { margin: 0; }
+.days-of-week label ~ label { margin-left: 2ex;}
+.auto-config-set { position: relative; }
+.auto-config-set .loading {
+  position: absolute;
+  width: calc(100% - 15px);
+  height: calc(100% - 15px);
+  background: rgba(255,255,255,0.9);
+  font-size:  1.5em;
 }
