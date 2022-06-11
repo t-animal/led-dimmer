@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>LedDimmer config page</title>
+  <script type="module" src="/src/main.ts"></script>
+	
+	<style>
+		html[data-mode='dark'], html[data-mode='dark'] button, html[data-mode='dark'] input {
+			color: #ddd;
+			background-color: #222;
+		}
+		html[data-mode='dark'] button, html[data-mode='dark'] input {
+			background-color: #333;
+			border: 1px solid #ddd;
+			border-radius: 2px;
+		}
+		@media (prefers-color-scheme: dark) {
+			html[data-mode='dark'], html[data-mode='dark'] button, html[data-mode='dark'] input {
+				color: #ddd;
+				background-color: #222;
+			}
+			html[data-mode='dark'] button, html[data-mode='dark'] input {
+				background-color: #333;
+				border: 1px solid #ddd;
+				border-radius: 2px;
+			}
+		}
+		label {
+			margin-right: 5ex;
+			white-space: nowrap;
+		}
+		.days-of-week label { margin: 0; }
+		.days-of-week label ~ label { margin-left: 2ex;}
+		.auto-config-set { position: relative; }
+		.auto-config-set .loading {
+			position: absolute;
+			width: calc(100% - 15px);
+			height: calc(100% - 15px);
+			background: rgba(255,255,255,0.9);
+			font-size:  1.5em;
+		}
+	</style>
+</head>
+<body>
+<h1>LedDimmer</h1>
+
+<fieldset>
+	<legend>Presets</legend>
+	<button onclick="setCurrent(100)">An (100%)</button>
+	<button onclick="setCurrent(70)">An (70%)</button>
+	<button onclick="setCurrent(30)">An (30%)</button>
+	<button onclick="setCurrent(0)">Aus (0%)</button>
+</fieldset>
+
+<fieldset>
+	<legend>Manual</legend>
+	<input id="manualInput" type="range" min="0" max="100" value="-1" oninput="this.nextElementSibling.value = this.value">
+	<output>---</output>
+	<button onclick="setCurrentManually()">Setzen</button>
+</fieldset>
+
+<fieldset>
+	<legend>Datum und Uhrzeit</legend>
+	<span id="currentTime">Lade...</span> (UTC)
+	<button onclick="forceTimeUpdate()">Force Update</button>
+</fieldset>
+
+<h2>Automatisiertes Schalten</h2>
+
+<p>Beachte: Uhrzeiten müssen in UTC angegeben werden (vergleiche Uhrzeit oben).</p>
+
+<!-- TODO: minimize using template? -->
+<fieldset class="auto-config-set" data-config-index="0">
+	<div class="loading">Lade...</div>
+	<legend>Automatisches ein- und ausschalten Config 1</legend>
+	<form>
+		<label>Aktiviert <input type="checkbox" name="enabled"></label>
+		<label>Anschalten um <input type="time" name="startTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
+		<label>Abschalten um <input type="time" name="endTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
+		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label> <br />
+		<span class="days-of-week">Aktiv am
+			<label><input type="checkbox" name="daysOfWeek" value="Mon" /> Montag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Tue" /> Dienstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Wed" /> Mittwoch</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Thu" /> Donnerstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Fri" /> Freitag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sat" /> Samstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sun" /> Sonntag</label>
+		</span>
+		<br />
+		<button onclick="updateConfig(0);return false;">Speichern</button>
+	</form>
+</fieldset>
+
+<fieldset class="auto-config-set" data-config-index="1">
+	<div class="loading">Lade...</div>
+	<legend>Automatisches ein- und ausschalten Config 2</legend>
+	<form>
+		<label>Aktiviert <input type="checkbox" name="enabled"></label>
+		<label>Anschalten um <input type="time" name="startTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
+		<label>Abschalten um <input type="time" name="endTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
+		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label> <br />
+		<span class="days-of-week">Aktiv am
+			<label><input type="checkbox" name="daysOfWeek" value="Mon" /> Montag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Tue" /> Dienstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Wed" /> Mittwoch</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Thu" /> Donnerstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Fri" /> Freitag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sat" /> Samstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sun" /> Sonntag</label>
+		</span>
+		<br />
+		<button onclick="updateConfig(1);return false;">Speichern</button>
+	</form>
+</fieldset>
+
+<fieldset class="auto-config-set" data-config-index="2">
+	<div class="loading">Lade...</div>
+	<legend>Automatisches ein- und ausschalten Config 3</legend>
+	<form>
+		<label>Aktiviert <input type="checkbox" name="enabled"></label>
+		<label>Anschalten um <input type="time" name="startTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
+		<label>Abschalten um <input type="time" name="endTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
+		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label> <br />
+		<span class="days-of-week">Aktiv am
+			<label><input type="checkbox" name="daysOfWeek" value="Mon" /> Montag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Tue" /> Dienstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Wed" /> Mittwoch</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Thu" /> Donnerstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Fri" /> Freitag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sat" /> Samstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sun" /> Sonntag</label>
+		</span>
+		<br />
+		<button onclick="updateConfig(2);return false;">Speichern</button>
+	</form>
+</fieldset>
+
+<fieldset class="auto-config-set" data-config-index="3">
+	<div class="loading">Lade...</div>
+	<legend>Automatisches ein- und ausschalten Config 4</legend>
+	<form>
+		<label>Aktiviert <input type="checkbox" name="enabled"></label>
+		<label>Anschalten um <input type="time" name="startTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
+		<label>Abschalten um <input type="time" name="endTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
+		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label> <br />
+		<span class="days-of-week">Aktiv am
+			<label><input type="checkbox" name="daysOfWeek" value="Mon" /> Montag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Tue" /> Dienstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Wed" /> Mittwoch</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Thu" /> Donnerstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Fri" /> Freitag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sat" /> Samstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sun" /> Sonntag</label>
+		</span>
+		<br />
+		<button onclick="updateConfig(3);return false;">Speichern</button>
+	</form>
+</fieldset>
+
+<fieldset class="auto-config-set" data-config-index="4">
+	<div class="loading">Lade...</div>
+	<legend>Automatisches ein- und ausschalten Config 5</legend>
+	<form>
+		<label>Aktiviert <input type="checkbox" name="enabled"></label>
+		<label>Anschalten um <input type="time" name="startTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
+		<label>Abschalten um <input type="time" name="endTime" required onInput="printEffective(this)"> UTC (Lokal: <output></output>)</label>
+		<label>Wert <input type="number" min="0" max="100" name="percentage" required></label> <br />
+		<span class="days-of-week">Aktiv am
+			<label><input type="checkbox" name="daysOfWeek" value="Mon" /> Montag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Tue" /> Dienstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Wed" /> Mittwoch</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Thu" /> Donnerstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Fri" /> Freitag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sat" /> Samstag</label>
+			<label><input type="checkbox" name="daysOfWeek" value="Sun" /> Sonntag</label>
+		</span>
+		<br />
+		<button onclick="updateConfig(4);return false;">Speichern</button>
+	</form>
+</fieldset>
+
+<textarea id="log" readonly>
+
+</textarea>
+
+
+</body>
+</html>
