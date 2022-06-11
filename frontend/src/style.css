@@ -8,11 +8,11 @@ html[data-mode='dark'] button, html[data-mode='dark'] input {
   border-radius: 2px;
 }
 @media (prefers-color-scheme: dark) {
-  html[data-mode='dark'], html[data-mode='dark'] button, html[data-mode='dark'] input {
+  html, button, input {
     color: #ddd;
     background-color: #222;
   }
-  html[data-mode='dark'] button, html[data-mode='dark'] input {
+  button, input {
     background-color: #333;
     border: 1px solid #ddd;
     border-radius: 2px;

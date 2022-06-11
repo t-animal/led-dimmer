@@ -3,7 +3,7 @@ import './style.css';
 // const urlBase='';
 const urlBase='http://leddimmer.fritz.box';
 
-function setCurrent(value) {
+function setCurrent(value: string) {
   const headers = {'Content-Type': 'text/plain'};
   fetch(
     `${urlBase}/current`, {
@@ -15,30 +15,35 @@ function setCurrent(value) {
 
 async function getAndWriteTime() {
   const time = await (await fetch(`${urlBase}/time`)).text();
-  document.querySelector('#currentTime').textContent = time;
+  (<HTMLOutputElement>document.querySelector('#currentTime')).textContent = time;
 }
 
-function forceTimeUpdate() {
-  const time = fetch(`${urlBase}/time/update`);
+async function forceTimeUpdate() {
+  await fetch(`${urlBase}/time/update`);
   getAndWriteTime();
 }
 
-async function getAndWriteConfig(index) {
+async function getAndWriteConfig(index: number) {
   const config = await (await fetch(`${urlBase}/config/${index}`)).json();
-  document.querySelector(`[data-config-index="${index}"] [name=enabled]`).checked = config.enabled;
-  document.querySelector(`[data-config-index="${index}"] [name=startTime]`).value = config.startTime;
-  document.querySelector(`[data-config-index="${index}"] [name=endTime]`).value = config.endTime;
-  document.querySelector(`[data-config-index="${index}"] [name=percentage]`).value = config.percentage;
-  document.querySelector(`[data-config-index="${index}"] .loading`).style.display = 'none';
-  document.querySelectorAll(`[data-config-index="${index}"] input[name="daysOfWeek"]`).forEach((elem) =>
+  const parent = document.querySelector(`[data-config-index="${index}"]`);
+  if(parent === null) {return;}
+  parent.querySelector<HTMLInputElement>(`[name=enabled]`)!.checked = config.enabled;
+  parent.querySelector<HTMLInputElement>(`[name=startTime]`)!.value = config.startTime;
+  parent.querySelector<HTMLInputElement>(`[name=endTime]`)!.value = config.endTime;
+  parent.querySelector<HTMLInputElement>(`[name=percentage]`)!.value = config.percentage;
+  parent.querySelector<HTMLDivElement>(`.loading`)!.style.display = 'none';
+  parent.querySelectorAll<HTMLInputElement>(`input[name="daysOfWeek"]`).forEach((elem) =>
     elem.checked = config.daysOfWeek.includes(elem.value));
-  document.querySelectorAll(`[data-config-index="${index}"] [type="time"]`).forEach(printEffective);
+  parent.querySelectorAll<HTMLInputElement>(`[type="time"]`).forEach(printEffective);
 }
 
-async function updateConfig(index) {
-  document.querySelector(`[data-config-index="${index}"] .loading`).style.display = 'block';
-  const form = document.querySelector(`[data-config-index="${index}"] form`);
-  const data = new URLSearchParams(new FormData(form));
+async function updateConfig(index: number) {
+  document
+    .querySelector<HTMLDivElement>(`[data-config-index="${index}"] .loading`)!.style
+    .display = 'block';
+  const form = document.querySelector<HTMLFormElement>(`[data-config-index="${index}"] form`);
+  if(form == null) {return;}
+  const data = new URLSearchParams(new FormData(form) as any);
   data.set('daysOfWeek', data.getAll('daysOfWeek').join(','));
   await fetch(
     `${urlBase}/config/${index}`, {
@@ -49,19 +54,19 @@ async function updateConfig(index) {
 }
 
 function setCurrentManually() {
-  setCurrent(document.querySelector('#manualInput').value);
+  setCurrent(document.querySelector<HTMLInputElement>('#manualInput')?.value ?? '');
 }
 
-function printEffective(elem) {
+function printEffective(elem: HTMLInputElement) {
   const offsetInMinutes = new Date().getTimezoneOffset();
-  const utcHours = elem.valueAsDate.getUTCHours();
-  const utcMinutes = elem.valueAsDate.getUTCMinutes();
+  const utcHours = elem.valueAsDate?.getUTCHours() ?? 0;
+  const utcMinutes = elem.valueAsDate?.getUTCMinutes() ?? 0;
 
-  const localHours = parseInt((utcHours * 60 + utcMinutes - offsetInMinutes) / 60 % 24);
+  const localHours = parseInt((utcHours * 60 + utcMinutes - offsetInMinutes) / 60 % 24 as any);
   const localMinutes = (utcHours * 60 + utcMinutes - offsetInMinutes) % 60;
   const localString = localHours.toString().padStart(2,'0') + ":"
       + localMinutes.toString().padStart(2,'0');
-  elem.nextElementSibling.textContent = localString;
+  elem.nextElementSibling!.textContent = localString;
 }
 
 getAndWriteTime();
@@ -73,5 +78,5 @@ getAndWriteConfig(3);
 getAndWriteConfig(4);
 
 if(location.search.includes('mode=dark')) {
-  document.querySelector('html').dataset.mode='dark';
+  document.querySelector<HTMLElement>('html')!.dataset.mode='dark';
 }
