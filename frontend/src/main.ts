@@ -13,6 +13,14 @@ function setCurrent(value: string) {
   });
 }
 
+async function getAndWriteCurrent() {
+  const value = await (await fetch(`${urlBase}/current`)).text();
+  const input = document.querySelector<HTMLInputElement>('#manualInput');
+
+  input!.value = value;
+  (<HTMLOutputElement>input!.nextElementSibling).value = value;
+}
+
 async function getAndWriteTime() {
   const time = await (await fetch(`${urlBase}/time`)).text();
   (<HTMLOutputElement>document.querySelector('#currentTime')).textContent = time;
@@ -76,6 +84,7 @@ getAndWriteConfig(1);
 getAndWriteConfig(2);
 getAndWriteConfig(3);
 getAndWriteConfig(4);
+getAndWriteCurrent();
 
 if(location.search.includes('mode=dark')) {
   document.querySelector<HTMLElement>('html')!.dataset.mode='dark';
