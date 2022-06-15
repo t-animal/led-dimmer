@@ -1,7 +1,5 @@
 import './style.css';
-
-// const urlBase='';
-const urlBase='http://leddimmer.fritz.box';
+const urlBase= import.meta.env.PROD ? '' :  'http://leddimmer.fritz.box';
 
 function setCurrent(value: string) {
   const headers = {'Content-Type': 'text/plain'};
