@@ -1,7 +1,7 @@
 import './style.css';
 const urlBase= import.meta.env.PROD ? '' :  'http://leddimmer.fritz.box';
 
-function setCurrent(value: string) {
+window.setCurrent = function (value: string) {
   const headers = {'Content-Type': 'text/plain'};
   fetch(
     `${urlBase}/current`, {
@@ -29,7 +29,7 @@ async function getAndWriteTime() {
   (<HTMLOutputElement>document.querySelector('#currentTime')).textContent = time;
 }
 
-async function forceTimeUpdate() {
+window.forceTimeUpdate = async function () {
   await fetch(`${urlBase}/time/update`);
   getAndWriteTime();
 }
@@ -48,7 +48,7 @@ async function getAndWriteConfig(index: number) {
   parent.querySelectorAll<HTMLInputElement>(`[type="time"]`).forEach(printEffective);
 }
 
-async function updateConfig(index: number) {
+window.updateConfig = async function(index: number) {
   document
     .querySelector<HTMLDivElement>(`[data-config-index="${index}"] .loading`)!.style
     .display = 'block';
@@ -64,11 +64,11 @@ async function updateConfig(index: number) {
   await getAndWriteConfig(index);
 }
 
-function setCurrentManually() {
+window.setCurrentManually =function () {
   setCurrent(document.querySelector<HTMLInputElement>('#manualInput')?.value ?? '');
 }
 
-function printEffective(elem: HTMLInputElement) {
+window.printEffective = function (elem: HTMLInputElement) {
   const offsetInMinutes = new Date().getTimezoneOffset();
   const utcHours = elem.valueAsDate?.getUTCHours() ?? 0;
   const utcMinutes = elem.valueAsDate?.getUTCMinutes() ?? 0;
