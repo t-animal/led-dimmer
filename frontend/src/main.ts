@@ -21,6 +21,11 @@ async function getAndWriteCurrent() {
   (<HTMLOutputElement>input!.nextElementSibling).value = value;
 }
 
+window.getAndWriteLog = async function () {
+  const value = await (await fetch(`${urlBase}/log`)).text();
+  document.querySelector<HTMLTextAreaElement>('#log')!.textContent = value;
+}
+
 async function getAndWriteTime() {
   const time = await (await fetch(`${urlBase}/time`)).text();
   (<HTMLOutputElement>document.querySelector('#currentTime')).textContent = time;
@@ -79,6 +84,8 @@ function printEffective(elem: HTMLInputElement) {
 
 getAndWriteTime();
 setInterval(getAndWriteTime, 10000);
+getAndWriteLog();
+setInterval(getAndWriteLog, 10000);
 getAndWriteConfig(0);
 getAndWriteConfig(1);
 getAndWriteConfig(2);
