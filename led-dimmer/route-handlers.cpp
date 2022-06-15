@@ -84,6 +84,11 @@ void httpServerHandleConfig(int index, AutoConfig& config) {
   }
 }
 
+
+void httpServerHandleLog() {
+  sendSuccess(logger.read());
+}
+
 void httpServerHandleNotFound() {
   String message = "File Not Found\n\n";
   message += "Time: " + timeClient.getFormattedTime();
